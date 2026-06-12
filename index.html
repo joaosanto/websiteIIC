@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IIC – International Industrial Consulting</title>
+  <meta name="description" content="IIC – International Industrial Consulting. Especialistas em moldes de injeção, componentes automotivos, sistemas de manufatura e consultoria industrial de excelência global." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav id="navbar" class="navbar">
+    <div class="nav-container">
+      <a href="#home" class="nav-logo">
+        <img src="assets/logo.png" alt="IIC Logo" class="logo-img" />
+      </a>
+      <div class="lang-toggle">
+        <button id="lang-pt" class="lang-btn active" onclick="setLang('pt')">PT</button>
+        <span>|</span>
+        <button id="lang-en" class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-menu" id="nav-menu">
+        <li><a href="#home" class="nav-link" data-pt="Início" data-en="Home">Início</a></li>
+        <li><a href="#services" class="nav-link" data-pt="Serviços" data-en="Services">Serviços</a></li>
+        <li><a href="#areas" class="nav-link" data-pt="Áreas" data-en="Areas">Áreas</a></li>
+        <li><a href="#team" class="nav-link" data-pt="Equipa" data-en="Team">Equipa</a></li>
+        <li><a href="#contact" class="nav-link cta-nav" data-pt="Contacto" data-en="Contact">Contacto</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="home" class="hero">
+    <div class="hero-bg">
+      <img src="assets/hero_bg.png" alt="Industrial Manufacturing" class="hero-bg-img" />
+      <div class="hero-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge" data-pt="Consultoria Industrial Global" data-en="Global Industrial Consulting">Consultoria Industrial Global</div>
+      <h1 class="hero-title">
+        <span class="title-line" data-pt="Engenharia" data-en="Engineering">Engenharia</span>
+        <span class="title-line gold" data-pt="de Excelência" data-en="Excellence">de Excelência</span>
+        <span class="title-line" data-pt="à Escala Global" data-en="at a Global Scale">à Escala Global</span>
+      </h1>
+      <p class="hero-sub" data-pt="Especialistas em moldes de injeção plástica, componentes automotivos, automação industrial e estudos reológicos de classe mundial." data-en="Specialists in plastic injection molds, automotive components, industrial automation, and world-class rheological studies.">
+        Especialistas em moldes de injeção plástica, componentes automotivos, automação industrial e estudos reológicos de classe mundial.
+      </p>
+      <div class="hero-actions">
+        <a href="#services" class="btn btn-primary" data-pt="Explorar Serviços" data-en="Explore Services">Explorar Serviços</a>
+        <a href="#contact" class="btn btn-outline" data-pt="Falar Connosco" data-en="Get in Touch">Falar Connosco</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-num">20+</span>
+          <span class="stat-label" data-pt="Anos de Experiência" data-en="Years of Experience">Anos de Experiência</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num">8</span>
+          <span class="stat-label" data-pt="Áreas de Negócio" data-en="Business Areas">Áreas de Negócio</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num">150+</span>
+          <span class="stat-label" data-pt="Projetos Concluídos" data-en="Projects Completed">Projetos Concluídos</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      <span data-pt="Scroll" data-en="Scroll">Scroll</span>
+    </div>
+  </section>
+
+  <!-- ABOUT STRIP -->
+  <section class="about-strip">
+    <div class="container">
+      <div class="strip-grid">
+        <div class="strip-icon-block">
+          <div class="strip-icon">🌐</div>
+          <div>
+            <h3 data-pt="Alcance Global" data-en="Global Reach">Alcance Global</h3>
+            <p data-pt="Presença em múltiplos mercados internacionais." data-en="Presence across multiple international markets.">Presença em múltiplos mercados internacionais.</p>
+          </div>
+        </div>
+        <div class="strip-icon-block">
+          <div class="strip-icon">⚙️</div>
+          <div>
+            <h3 data-pt="Precisão Técnica" data-en="Technical Precision">Precisão Técnica</h3>
+            <p data-pt="Engenharia de alta performance para a indústria 4.0." data-en="High-performance engineering for Industry 4.0.">Engenharia de alta performance para a indústria 4.0.</p>
+          </div>
+        </div>
+        <div class="strip-icon-block">
+          <div class="strip-icon">💡</div>
+          <div>
+            <h3 data-pt="Inovação Aplicada" data-en="Applied Innovation">Inovação Aplicada</h3>
+            <p data-pt="Soluções customizadas com tecnologia de ponta." data-en="Customised solutions with cutting-edge technology.">Soluções customizadas com tecnologia de ponta.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services" class="services section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" data-pt="O que fazemos" data-en="What we do">O que fazemos</span>
+        <h2 data-pt="Serviços de Excelência" data-en="Excellence Services">Serviços de <span class="gold-text">Excelência</span></h2>
+        <p data-pt="Consultoria especializada para os desafios mais complexos da indústria moderna." data-en="Specialised consulting for the most complex challenges in modern industry.">Consultoria especializada para os desafios mais complexos da indústria moderna.</p>
+      </div>
+      <div class="services-grid">
+
+        <div class="service-card" data-delay="0">
+          <div class="service-card-inner">
+            <div class="service-icon-wrap">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="16" width="48" height="32" rx="4" stroke="#C9A84C" stroke-width="2.5"/><rect x="16" y="24" width="12" height="16" rx="2" stroke="#C9A84C" stroke-width="2"/><rect x="36" y="24" width="12" height="16" rx="2" stroke="#C9A84C" stroke-width="2"/><line x1="28" y1="32" x2="36" y2="32" stroke="#C9A84C" stroke-width="2.5"/></svg>
+            </div>
+            <h3 data-pt="Moldes de Injeção Plástica" data-en="Plastic Injection Molds">Moldes de Injeção Plástica</h3>
+            <p data-pt="Desenvolvimento e consultoria de moldes de alta precisão para embalagem e componentes automotivos." data-en="Development and consulting of high-precision molds for packaging and automotive components.">Desenvolvimento e consultoria de moldes de alta precisão para embalagem e componentes automotivos.</p>
+            <a href="#contact" class="service-link" data-pt="Saber mais →" data-en="Learn more →">Saber mais →</a>
+          </div>
+        </div>
+
+        <div class="service-card" data-delay="100">
+          <div class="service-card-inner">
+            <div class="service-icon-wrap">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="#C9A84C" stroke-width="2.5"/><polyline points="22,32 28,38 42,24" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3 data-pt="Aços Especiais para Moldes" data-en="Special Steels for Molds">Aços Especiais para Moldes</h3>
+            <p data-pt="Fornecimento e consultoria em aços especiais de alto desempenho para ferramentaria industrial." data-en="Supply and consulting in high-performance special steels for industrial tooling.">Fornecimento e consultoria em aços especiais de alto desempenho para ferramentaria industrial.</p>
+            <a href="#contact" class="service-link" data-pt="Saber mais →" data-en="Learn more →">Saber mais →</a>
+          </div>
+        </div>
+
+        <div class="service-card featured" data-delay="200">
+          <div class="service-card-inner">
+            <div class="service-icon-wrap">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M32 8 L56 32 L32 56 L8 32 Z" stroke="#C9A84C" stroke-width="2.5"/><circle cx="32" cy="32" r="8" stroke="#C9A84C" stroke-width="2"/></svg>
+            </div>
+            <div class="featured-badge" data-pt="Destaque" data-en="Featured">Destaque</div>
+            <h3 data-pt="Sistemas de Rastreio de Moldes" data-en="Mold Tracking Systems">Sistemas de Rastreio de Moldes</h3>
+            <p data-pt="Soluções de rastreamento inteligente para monitorização e gestão do ciclo de vida de moldes críticos." data-en="Intelligent tracking solutions for monitoring and lifecycle management of critical molds.">Soluções de rastreamento inteligente para monitorização e gestão do ciclo de vida de moldes críticos.</p>
+            <a href="#contact" class="service-link" data-pt="Saber mais →" data-en="Learn more →">Saber mais →</a>
+          </div>
+        </div>
+
+        <div class="service-card" data-delay="300">
+          <div class="service-card-inner">
+            <div class="service-icon-wrap">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="12" y="28" width="10" height="20" rx="2" stroke="#C9A84C" stroke-width="2.5"/><rect x="27" y="20" width="10" height="28" rx="2" stroke="#C9A84C" stroke-width="2.5"/><rect x="42" y="14" width="10" height="34" rx="2" stroke="#C9A84C" stroke-width="2.5"/><line x1="8" y1="52" x2="56" y2="52" stroke="#C9A84C" stroke-width="2"/></svg>
+            </div>
+            <h3 data-pt="Estudos Reológicos Moldflow" data-en="Moldflow Rheology Studies">Estudos Reológicos Moldflow</h3>
+            <p data-pt="Simulação e análise avançada com tecnologia Moldflow para otimização do processo de injeção." data-en="Advanced simulation and analysis with Moldflow technology to optimise the injection process.">Simulação e análise avançada com tecnologia Moldflow para otimização do processo de injeção.</p>
+            <a href="#contact" class="service-link" data-pt="Saber mais →" data-en="Learn more →">Saber mais →</a>
+          </div>
+        </div>
+
+        <div class="service-card" data-delay="400">
+          <div class="service-card-inner">
+            <div class="service-icon-wrap">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="32" r="8" stroke="#C9A84C" stroke-width="2.5"/><circle cx="44" cy="32" r="8" stroke="#C9A84C" stroke-width="2.5"/><line x1="28" y1="32" x2="36" y2="32" stroke="#C9A84C" stroke-width="2.5"/><path d="M12 44 Q20 52 28 44" stroke="#C9A84C" stroke-width="2" fill="none"/></svg>
+            </div>
+            <h3 data-pt="Máquinas de Teste de Circuito de Água" data-en="Water Circuit Testing Machines">Máquinas de Teste de Circuito de Água</h3>
+            <p data-pt="Equipamentos especializados para teste e limpeza de circuitos de arrefecimento em moldes industriais." data-en="Specialised equipment for testing and cleaning cooling circuits in industrial molds.">Equipamentos especializados para teste e limpeza de circuitos de arrefecimento em moldes industriais.</p>
+            <a href="#contact" class="service-link" data-pt="Saber mais →" data-en="Learn more →">Saber mais →</a>
+          </div>
+        </div>
+
+        <div class="service-card" data-delay="500">
+          <div class="service-card-inner">
+            <div class="service-icon-wrap">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="16" y="16" width="32" height="32" rx="4" stroke="#C9A84C" stroke-width="2.5"/><path d="M24 32 L28 36 L40 24" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3 data-pt="Automação de Moldes" data-en="Mold Automation">Automação de Moldes</h3>
+            <p data-pt="Sistemas de automação avançados para processos de injeção plástica eficientes e repetíveis." data-en="Advanced automation systems for efficient and repeatable plastic injection processes.">Sistemas de automação avançados para processos de injeção plástica eficientes e repetíveis.</p>
+            <a href="#contact" class="service-link" data-pt="Saber mais →" data-en="Learn more →">Saber mais →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- BUSINESS AREAS -->
+  <section id="areas" class="areas section">
+    <div class="areas-bg-glow"></div>
+    <div class="container">
+      <div class="section-header light">
+        <span class="section-tag" data-pt="O nosso foco" data-en="Our focus">O nosso foco</span>
+        <h2 data-pt="Áreas de Negócio" data-en="Business Areas">Áreas de <span class="gold-text">Negócio</span></h2>
+        <p data-pt="Cobrimos todo o espectro da consultoria industrial com profundidade técnica e experiência comprovada." data-en="We cover the full spectrum of industrial consulting with technical depth and proven expertise.">Cobrimos todo o espectro da consultoria industrial com profundidade técnica e experiência comprovada.</p>
+      </div>
+      <div class="areas-grid">
+        <div class="area-item reveal">
+          <div class="area-number">01</div>
+          <div class="area-content">
+            <h4 data-pt="Moldes de Injeção para Embalagem" data-en="Packaging Injection Molds">Moldes de Injeção para Embalagem</h4>
+            <p data-pt="Desenvolvimento de moldes para soluções de embalagem plástica de alta precisão." data-en="Development of molds for high-precision plastic packaging solutions.">Desenvolvimento de moldes para soluções de embalagem plástica de alta precisão.</p>
+          </div>
+        </div>
+        <div class="area-item reveal">
+          <div class="area-number">02</div>
+          <div class="area-content">
+            <h4 data-pt="Moldes Plásticos Automotivos" data-en="Automotive Plastic Molds">Moldes Plásticos Automotivos</h4>
+            <p data-pt="Moldes de alto desempenho para componentes automotivos de precisão." data-en="High-performance molds for precision automotive components.">Moldes de alto desempenho para componentes automotivos de precisão.</p>
+          </div>
+        </div>
+        <div class="area-item reveal">
+          <div class="area-number">03</div>
+          <div class="area-content">
+            <h4 data-pt="Aços Especiais para Moldes" data-en="Special Steels for Molds">Aços Especiais para Moldes</h4>
+            <p data-pt="Fornecimento e consultoria em aços especiais para ferramentaria." data-en="Supply and consulting in special steels for tooling.">Fornecimento e consultoria em aços especiais para ferramentaria.</p>
+          </div>
+        </div>
+        <div class="area-item reveal">
+          <div class="area-number">04</div>
+          <div class="area-content">
+            <h4 data-pt="Sistemas de Rastreio de Moldes" data-en="Mold Tracking Systems">Sistemas de Rastreio de Moldes</h4>
+            <p data-pt="Soluções de monitorização inteligente para moldes críticos." data-en="Intelligent monitoring solutions for critical molds.">Soluções de monitorização inteligente para moldes críticos.</p>
+          </div>
+        </div>
+        <div class="area-item reveal">
+          <div class="area-number">05</div>
+          <div class="area-content">
+            <h4 data-pt="Automação de Moldes" data-en="Mold Automation">Automação de Moldes</h4>
+            <p data-pt="Automação de processos de injeção para máxima eficiência operacional." data-en="Injection process automation for maximum operational efficiency.">Automação de processos de injeção para máxima eficiência operacional.</p>
+          </div>
+        </div>
+        <div class="area-item reveal">
+          <div class="area-number">06</div>
+          <div class="area-content">
+            <h4 data-pt="Estudos Reológicos Moldflow" data-en="Moldflow Rheology Studies">Estudos Reológicos Moldflow</h4>
+            <p data-pt="Simulação avançada com Moldflow para otimização do processo." data-en="Advanced simulation with Moldflow for process optimisation.">Simulação avançada com Moldflow para otimização do processo.</p>
+          </div>
+        </div>
+        <div class="area-item reveal">
+          <div class="area-number">07</div>
+          <div class="area-content">
+            <h4 data-pt="Máquinas de Teste de Circuito de Água" data-en="Water Circuit Testing Machines">Máquinas de Teste de Circuito de Água</h4>
+            <p data-pt="Equipamentos para limpeza e teste de canais de arrefecimento." data-en="Equipment for cleaning and testing cooling channels.">Equipamentos para limpeza e teste de canais de arrefecimento.</p>
+          </div>
+        </div>
+        <div class="area-item reveal">
+          <div class="area-number">08</div>
+          <div class="area-content">
+            <h4 data-pt="Máquinas de Injeção Plástica" data-en="Plastic Injection Machines">Máquinas de Injeção Plástica</h4>
+            <p data-pt="Fornecimento e consultoria para máquinas de injeção plástica industriais." data-en="Supply and consulting for industrial plastic injection machines.">Fornecimento e consultoria para máquinas de injeção plástica industriais.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section id="team" class="team section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" data-pt="Quem somos" data-en="Who we are">Quem somos</span>
+        <h2 data-pt="A Nossa Equipa" data-en="Our Team">A Nossa <span class="gold-text">Equipa</span></h2>
+        <p data-pt="Consultores seniores com décadas de experiência na indústria de moldes e automação." data-en="Senior consultants with decades of experience in the mold making and automation industry.">Consultores seniores com décadas de experiência na indústria de moldes e automação.</p>
+      </div>
+      <div class="team-grid">
+        <div class="team-card reveal">
+          <div class="team-avatar">
+            <div class="avatar-placeholder">JM</div>
+            <div class="team-gold-ring"></div>
+          </div>
+          <div class="team-info">
+            <h4>João Mendes</h4>
+            <span class="team-role" data-pt="Especialista em Moldes Automotivos" data-en="Automotive Mold Specialist">Especialista em Moldes Automotivos</span>
+            <p data-pt="20+ anos em engenharia de moldes de injeção plástica para o sector automotivo europeu." data-en="20+ years in plastic injection mold engineering for the European automotive sector.">20+ anos em engenharia de moldes de injeção plástica para o sector automotivo europeu.</p>
+            <a href="#contact" class="team-cv-btn" data-pt="Descarregar CV" data-en="Download CV">Descarregar CV</a>
+          </div>
+        </div>
+        <div class="team-card reveal">
+          <div class="team-avatar">
+            <div class="avatar-placeholder">AS</div>
+            <div class="team-gold-ring"></div>
+          </div>
+          <div class="team-info">
+            <h4>Ana Santos</h4>
+            <span class="team-role" data-pt="Especialista em Design de Moldes" data-en="Mold Design Specialist">Especialista em Design de Moldes</span>
+            <p data-pt="Especialista em design de ferramentaria e aços especiais com experiência em projetos internacionais." data-en="Tooling design and special steels specialist with experience on international projects.">Especialista em design de ferramentaria e aços especiais com experiência em projetos internacionais.</p>
+            <a href="#contact" class="team-cv-btn" data-pt="Descarregar CV" data-en="Download CV">Descarregar CV</a>
+          </div>
+        </div>
+        <div class="team-card reveal">
+          <div class="team-avatar">
+            <div class="avatar-placeholder">RC</div>
+            <div class="team-gold-ring"></div>
+          </div>
+          <div class="team-info">
+            <h4>Rui Costa</h4>
+            <span class="team-role" data-pt="Especialista em Manufatura Avançada" data-en="Advanced Manufacturing Specialist">Especialista em Manufatura Avançada</span>
+            <p data-pt="Perito em sistemas de manufatura automatizada e integração de robótica industrial." data-en="Expert in automated manufacturing systems and industrial robotics integration.">Perito em sistemas de manufatura automatizada e integração de robótica industrial.</p>
+            <a href="#contact" class="team-cv-btn" data-pt="Descarregar CV" data-en="Download CV">Descarregar CV</a>
+          </div>
+        </div>
+        <div class="team-card reveal">
+          <div class="team-avatar">
+            <div class="avatar-placeholder">MF</div>
+            <div class="team-gold-ring"></div>
+          </div>
+          <div class="team-info">
+            <h4>Marta Ferreira</h4>
+            <span class="team-role" data-pt="Especialista Moldflow e Reologia" data-en="Moldflow & Rheology Specialist">Especialista Moldflow e Reologia</span>
+            <p data-pt="Doutora em polímeros com especialização em simulação Moldflow e otimização de processos de injeção." data-en="PhD in polymers specialised in Moldflow simulation and injection process optimisation.">Doutora em polímeros com especialização em simulação Moldflow e otimização de processos de injeção.</p>
+            <a href="#contact" class="team-cv-btn" data-pt="Descarregar CV" data-en="Download CV">Descarregar CV</a>
+          </div>
+        </div>
+        <div class="team-card reveal">
+          <div class="team-avatar">
+            <div class="avatar-placeholder">PO</div>
+            <div class="team-gold-ring"></div>
+          </div>
+          <div class="team-info">
+            <h4>Pedro Oliveira</h4>
+            <span class="team-role" data-pt="Especialista em Automação Industrial" data-en="Industrial Automation Specialist">Especialista em Automação Industrial</span>
+            <p data-pt="15+ anos em automação de processos e otimização de linhas de produção industrial de alto volume." data-en="15+ years in process automation and optimisation of high-volume industrial production lines.">15+ anos em automação de processos e otimização de linhas de produção industrial de alto volume.</p>
+            <a href="#contact" class="team-cv-btn" data-pt="Descarregar CV" data-en="Download CV">Descarregar CV</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <section class="cta-banner">
+    <div class="cta-banner-bg"></div>
+    <div class="container cta-content">
+      <h2 data-pt="Pronto para elevar a sua operação industrial?" data-en="Ready to elevate your industrial operation?">Pronto para elevar a sua <span class="gold-text">operação industrial?</span></h2>
+      <p data-pt="Trabalhe com os melhores especialistas do sector para soluções que fazem a diferença." data-en="Work with the best specialists in the industry for solutions that make a difference.">Trabalhe com os melhores especialistas do sector para soluções que fazem a diferença.</p>
+      <a href="#contact" class="btn btn-primary btn-large" data-pt="Iniciar Projeto" data-en="Start a Project">Iniciar Projeto</a>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="contact section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" data-pt="Fale Connosco" data-en="Get in Touch">Fale Connosco</span>
+        <h2 data-pt="Contacto" data-en="Contact">Entre em <span class="gold-text">Contacto</span></h2>
+        <p data-pt="Estamos disponíveis para discutir o seu projeto e apresentar a melhor solução industrial." data-en="We are available to discuss your project and present the best industrial solution.">Estamos disponíveis para discutir o seu projeto e apresentar a melhor solução industrial.</p>
+      </div>
+      <div class="contact-layout">
+        <div class="contact-info">
+          <div class="contact-item">
+            <div class="ci-icon">📧</div>
+            <div>
+              <span data-pt="Email" data-en="Email">Email</span>
+              <a href="mailto:info@iic-consulting.com">info@iic-consulting.com</a>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="ci-icon">📞</div>
+            <div>
+              <span data-pt="Telefone" data-en="Phone">Telefone</span>
+              <a href="tel:+351912345678">+351 912 345 678</a>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="ci-icon">📍</div>
+            <div>
+              <span data-pt="Localização" data-en="Location">Localização</span>
+              <p>Portugal / Internacional</p>
+            </div>
+          </div>
+        </div>
+        <form class="contact-form" id="contact-form" onsubmit="handleSubmit(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name" data-pt="Nome" data-en="Name">Nome</label>
+              <input type="text" id="name" name="name" required placeholder="João Silva" />
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" required placeholder="joao@empresa.com" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="subject" data-pt="Assunto" data-en="Subject">Assunto</label>
+            <input type="text" id="subject" name="subject" required />
+          </div>
+          <div class="form-group">
+            <label for="message" data-pt="Mensagem" data-en="Message">Mensagem</label>
+            <textarea id="message" name="message" rows="5" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" id="submit-btn" data-pt="Enviar Mensagem" data-en="Send Message">Enviar Mensagem</button>
+          <div id="form-success" class="form-success" style="display:none" data-pt="Mensagem enviada com sucesso! Entraremos em contacto em breve." data-en="Message sent successfully! We'll be in touch soon.">Mensagem enviada com sucesso! Entraremos em contacto em breve.</div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-logo">
+        <img src="assets/logo.png" alt="IIC Logo" />
+        <p data-pt="Consultoria Industrial de Excelência Global" data-en="Global Excellence Industrial Consulting">Consultoria Industrial de Excelência Global</p>
+      </div>
+      <div class="footer-links">
+        <a href="#home" data-pt="Início" data-en="Home">Início</a>
+        <a href="#services" data-pt="Serviços" data-en="Services">Serviços</a>
+        <a href="#areas" data-pt="Áreas" data-en="Areas">Áreas</a>
+        <a href="#team" data-pt="Equipa" data-en="Team">Equipa</a>
+        <a href="#contact" data-pt="Contacto" data-en="Contact">Contacto</a>
+      </div>
+      <p class="footer-copy">© 2025 IIC – International Industrial Consulting. <span data-pt="Todos os direitos reservados." data-en="All rights reserved.">Todos os direitos reservados.</span></p>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
