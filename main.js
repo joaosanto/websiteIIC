@@ -7,6 +7,12 @@
 (function () {
   'use strict';
 
+  /* ── Theme System (load saved theme) ── */
+  const savedTheme = localStorage.getItem('iic-theme');
+  if (savedTheme === 'light') {
+    document.documentElement.classList.add('light-theme');
+  }
+
   /* ── Language System ── */
   let currentLang = localStorage.getItem('iic-lang') || 'pt';
 

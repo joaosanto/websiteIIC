@@ -37,6 +37,7 @@
           <span class="atb-hint">Clique nos textos para editar · <strong>+ Adicionar</strong> para novos blocos · <strong>✕</strong> para eliminar · <strong>🗂 Secções</strong> para gerir secções</span>
         </div>
         <div class="atb-right">
+          <button id="adm-theme" class="abtn abtn-secondary" title="Alternar entre tema escuro e claro">🌙 Escuro</button>
           <button id="adm-sections" class="abtn abtn-secondary">🗂 Secções</button>
           <button id="adm-menu" class="abtn abtn-secondary">🔗 Menu</button>
           <button id="adm-save" class="abtn abtn-gold">💾 Guardar</button>
@@ -55,6 +56,7 @@
     document.getElementById('adm-export').onclick = exportHTML;
     document.getElementById('adm-reset').onclick = reset;
     document.getElementById('adm-logout').onclick = logoutAdmin;
+    document.getElementById('adm-theme').onclick = toggleTheme;
     document.getElementById('adm-sections').onclick = openSectionPanel;
     document.getElementById('adm-menu').onclick = openMenuPanel;
   }
@@ -549,11 +551,41 @@
   }
 
   /* ════════════════════════════════════════
+     THEME TOGGLE
+  ════════════════════════════════════════ */
+  function loadTheme() {
+    const saved = localStorage.getItem('iic-theme');
+    if (saved === 'light') {
+      document.documentElement.classList.add('light-theme');
+    } else {
+      document.documentElement.classList.remove('light-theme');
+    }
+    updateThemeButton();
+  }
+
+  function toggleTheme() {
+    const isLight = document.documentElement.classList.toggle('light-theme');
+    localStorage.setItem('iic-theme', isLight ? 'light' : 'dark');
+    updateThemeButton();
+    showToast(isLight ? '☀️ Tema claro ativado!' : '🌙 Tema escuro ativado!');
+  }
+
+  function updateThemeButton() {
+    const btn = document.getElementById('adm-theme');
+    if (!btn) return;
+    const isLight = document.documentElement.classList.contains('light-theme');
+    btn.innerHTML = isLight ? '☀️ Claro' : '🌙 Escuro';
+    btn.title = isLight ? 'Mudar para tema escuro' : 'Mudar para tema claro';
+  }
+
+  /* ════════════════════════════════════════
      INIT
   ════════════════════════════════════════ */
   document.addEventListener('DOMContentLoaded', () => {
+    loadTheme();
     buildUI();
     loadSaved();
+    updateThemeButton();
   });
 
 })();

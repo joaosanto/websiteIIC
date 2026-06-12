@@ -33,6 +33,203 @@
   --shadow-glow: 0 0 80px rgba(30, 58, 120, 0.4);
 }
 
+/* --- Light Theme Override --- */
+:root.light-theme {
+  --navy-950: #f5f7fa;
+  --navy-900: #edf0f5;
+  --navy-800: #e2e7ef;
+  --navy-700: #d0d8e4;
+  --navy-600: #bcc6d6;
+  --gold-400: #c4940f;
+  --gold-500: #a87d0a;
+  --gold-600: #8c6808;
+  --silver: #4a5568;
+  --white: #1a202c;
+  --off-white: #f0f4f8;
+  --text-muted: #637085;
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-border: rgba(168, 125, 10, 0.2);
+  --glass-bg: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(168, 125, 10, 0.18);
+  --shadow-gold: 0 0 40px rgba(168, 125, 10, 0.1);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 80px rgba(168, 125, 10, 0.08);
+}
+
+/* Light theme – specific overrides */
+.light-theme body {
+  background-color: var(--navy-950);
+  color: var(--white);
+}
+
+.light-theme .hero-overlay {
+  background:
+    linear-gradient(to right, rgba(245, 247, 250, 0.92) 40%, rgba(245, 247, 250, 0.45) 100%),
+    linear-gradient(to top, rgba(245, 247, 250, 0.88) 0%, transparent 60%);
+}
+
+.light-theme .navbar.scrolled {
+  background: var(--glass-bg);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+.light-theme .hamburger span {
+  background: var(--white);
+}
+
+.light-theme .nav-menu {
+  background: var(--navy-950);
+}
+
+.light-theme .logo-img {
+  background: var(--off-white);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.light-theme .about-strip {
+  background: linear-gradient(135deg, var(--navy-800), var(--navy-900));
+  border-top: 1px solid rgba(168, 125, 10, 0.12);
+  border-bottom: 1px solid rgba(168, 125, 10, 0.12);
+}
+
+.light-theme .service-card {
+  background: var(--card-bg);
+  border-color: var(--card-border);
+  backdrop-filter: blur(12px);
+}
+
+.light-theme .service-card.featured {
+  background: linear-gradient(145deg, #fff8e7, #fff3d0);
+  border-color: rgba(168, 125, 10, 0.35);
+}
+
+.light-theme .service-icon-wrap {
+  background: rgba(168, 125, 10, 0.08);
+  border-color: rgba(168, 125, 10, 0.18);
+}
+
+.light-theme .areas {
+  background: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-800) 100%);
+}
+
+.light-theme .areas-bg-glow {
+  background: radial-gradient(circle, rgba(168, 125, 10, 0.08) 0%, transparent 70%);
+}
+
+.light-theme .areas-grid {
+  background: rgba(168, 125, 10, 0.06);
+  border-color: rgba(168, 125, 10, 0.1);
+}
+
+.light-theme .area-item {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(168, 125, 10, 0.08);
+}
+
+.light-theme .area-item:hover {
+  background: rgba(255, 248, 231, 0.9);
+}
+
+.light-theme .team-card {
+  background: var(--card-bg);
+  border-color: var(--card-border);
+  backdrop-filter: blur(12px);
+}
+
+.light-theme .avatar-placeholder {
+  background: linear-gradient(135deg, #e8dcc0, #f0e4c8);
+  color: var(--gold-600);
+}
+
+.light-theme .btn-primary {
+  color: #fff;
+}
+
+.light-theme .btn-outline {
+  color: var(--white);
+  border-color: rgba(26, 32, 44, 0.25);
+}
+
+.light-theme .btn-outline:hover {
+  border-color: var(--gold-500);
+  color: var(--gold-500);
+}
+
+.light-theme .cta-banner-bg {
+  background: linear-gradient(135deg, var(--navy-800) 0%, var(--navy-700) 50%, var(--navy-800) 100%);
+}
+
+.light-theme .ci-icon {
+  background: rgba(168, 125, 10, 0.08);
+  border-color: rgba(168, 125, 10, 0.15);
+}
+
+.light-theme .form-group input,
+.light-theme .form-group textarea {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(168, 125, 10, 0.18);
+  color: #1a202c;
+}
+
+.light-theme .form-group input:focus,
+.light-theme .form-group textarea:focus {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--gold-500);
+  box-shadow: 0 0 0 3px rgba(168, 125, 10, 0.1);
+}
+
+.light-theme .form-group input::placeholder,
+.light-theme .form-group textarea::placeholder {
+  color: #8a96a6;
+}
+
+.light-theme .footer {
+  background: var(--navy-900);
+  border-top: 1px solid rgba(168, 125, 10, 0.1);
+}
+
+.light-theme .footer-logo img {
+  background: var(--off-white);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.light-theme .hero-badge {
+  background: rgba(168, 125, 10, 0.1);
+  border-color: rgba(168, 125, 10, 0.25);
+}
+
+.light-theme .section-tag {
+  background: rgba(168, 125, 10, 0.08);
+  border-color: rgba(168, 125, 10, 0.18);
+}
+
+.light-theme .stat-divider {
+  background: rgba(168, 125, 10, 0.2);
+}
+
+.light-theme .strip-icon {
+  background: rgba(168, 125, 10, 0.08);
+  border-color: rgba(168, 125, 10, 0.15);
+}
+
+.light-theme .team-cv-btn {
+  border-color: rgba(168, 125, 10, 0.25);
+}
+
+.light-theme .team-cv-btn:hover {
+  background: rgba(168, 125, 10, 0.08);
+}
+
+.light-theme .form-success {
+  background: rgba(168, 125, 10, 0.08);
+  border-color: rgba(168, 125, 10, 0.25);
+}
+
+.light-theme .featured-badge {
+  color: #fff;
+}
+
 /* --- Reset & Base --- */
 *, *::before, *::after {
   margin: 0; padding: 0; box-sizing: border-box;
