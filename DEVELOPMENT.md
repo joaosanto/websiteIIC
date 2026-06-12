@@ -14,7 +14,7 @@ O website é totalmente estático (HTML/CSS/JS nativos) e está estruturado da s
   * Sistema de tradução (PT/EN).
   * Animações ao fazer scroll (Intersection Observer).
   * Comportamento do menu hambúrguer e barra de navegação.
-  * Formulário de contacto e efeito parallax no Hero.
+  * Efeito parallax no Hero e animação de contadores de estatísticas.
 * **[admin.js](file:///Users/joao.santo/Documents/GitHub/websiteIIC/admin.js)**: Lógica do CMS visual (Editor) para alteração de textos e secções em tempo real.
 * **[admin.css](file:///Users/joao.santo/Documents/GitHub/websiteIIC/admin.css)**: Estilos da barra de ferramentas, botões e modais do CMS.
 * **[assets/](file:///Users/joao.santo/Documents/GitHub/websiteIIC/assets)**: Pasta que contém imagens, logótipos e outros recursos visuais.
@@ -30,6 +30,8 @@ O website utiliza um sistema de tradução dinâmico baseado em atributos HTML (
   <h2 data-pt="Serviços" data-en="Services">Serviços</h2>
   ```
 * **Regra importante**: Ao adicionar novos elementos de texto no HTML, deve sempre incluir os atributos `data-pt` e `data-en` para que a comutação de idioma funcione corretamente.
+
+* **⚠️ Limitação importante — elementos com filhos HTML**: A função `setLang` usa `el.textContent = val`, o que **destrói elementos filho** (ex: `<span class="gold-text">`). Por isso, elementos como `<h2>` que contenham spans internos de estilo **não devem ter** `data-pt`/`data-en` no próprio `h2` — os atributos de tradução só funcionam corretamente em **elementos folha** (sem filhos HTML). A correção aplicada em Junho 2026 faz o `setLang` ignorar elementos com filhos, preservando os spans internos.
 
 ---
 
@@ -50,6 +52,13 @@ Por motivos de segurança e privacidade, o botão de edição (✏️) está **o
 * **Menu**: Adicione, reordene ou elimine links de navegação.
 * **Gestão de Blocos**: Adicione, duplique ou elimine Serviços, Áreas de Negócio ou Membros da Equipa.
 
+### 4. Comportamento do localStorage no Editor
+* O editor guarda o conteúdo em `localStorage` com a chave `iic-cms-v2`. Se o HTML base for alterado (ex: remoção do formulário de contacto), o editor continuará a mostrar o conteúdo antigo guardado.
+* **Solução**: Clicar em **🔄 Repor** na barra de edição para limpar o `localStorage` e carregar a versão atual do HTML.
+
+### 5. Regra — contenteditable aninhado
+* O editor (`makeTextsEditable`) não deve tornar `contenteditable` elementos que já são filhos de um elemento `contenteditable`. Fazê-lo cria comportamento imprevisível no browser. Correção aplicada em Junho 2026: elementos filhos directos de um `contenteditable` são ignorados pelo `makeTextsEditable`.
+
 ### 3. Diferença entre "Guardar" e "Exportar HTML"
 
 Para gerir as suas edições, a barra de ferramentas dispõe de dois botões principais com propósitos diferentes:
@@ -63,6 +72,17 @@ Para gerir as suas edições, a barra de ferramentas dispõe de dois botões pri
   * **O que faz**: Gera e descarrega um ficheiro `index.html` atualizado e "limpo" (removendo scripts de administração, botões de edição temporários e a barra de ferramentas).
   * **Para que serve**: Permite **publicar** as suas edições de forma definitiva.
   * **Como aplicar**: Para que as alterações fiquem visíveis para todo o público, deve substituir o ficheiro `index.html` na pasta do seu projeto pelo ficheiro recém-descarregado e efetuar o envio (deploy/push) para o servidor de alojamento (por exemplo, GitHub Pages).
+
+---
+
+## 🗂 Histórico de Alterações Relevantes
+
+| Data | Alteração |
+|------|-----------|
+| Jun 2026 | Adicionado modo dia/noite (tema claro/escuro) via `localStorage` |
+| Jun 2026 | Corrigido bug: `setLang` destruía spans internos de `h2` com `gold-text` |
+| Jun 2026 | Corrigido bug: `makeTextsEditable` criava `contenteditable` aninhados |
+| Jun 2026 | Formulário de contacto removido — secção de contacto mostra apenas dados de contacto |
 
 ---
 
