@@ -3,7 +3,22 @@
   'use strict';
 
   const STORAGE_KEY = 'iic-cms-v2';
+  const AUTH_KEY = 'iic-admin-authorized';
   let editMode = false;
+
+  // ── Admin Authorization System ──
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('edit') === '1') {
+    localStorage.setItem(AUTH_KEY, 'true');
+    // Clean query parameter from URL
+    const cleanUrl = window.location.pathname + window.location.hash;
+    window.history.replaceState({}, document.title, cleanUrl);
+  }
+
+  const isAdminAuthorized = localStorage.getItem(AUTH_KEY) === 'true';
+  if (!isAdminAuthorized) {
+    return; // Exit early if not authorized. Admin UI won't load.
+  }
 
   /* ── SVG icons for cards (service section) ── */
   const DEFAULT_ICON = `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="16" y="16" width="32" height="32" rx="4" stroke="#C9A84C" stroke-width="2.5"/><path d="M24 32 L28 36 L40 24" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -23,7 +38,9 @@
           <button id="adm-sections" class="abtn abtn-secondary">🗂 Secções</button>
           <button id="adm-menu" class="abtn abtn-secondary">🔗 Menu</button>
           <button id="adm-save" class="abtn abtn-gold">💾 Guardar</button>
+          <button id="adm-export" class="abtn abtn-gold" title="Descarregar ficheiro index.html limpo com as edições aplicadas">📥 Exportar HTML</button>
           <button id="adm-reset" class="abtn abtn-danger">🔄 Repor</button>
+          <button id="adm-logout" class="abtn abtn-danger" title="Sair do modo Administrador e ocultar o botão ✏️">🚪 Sair</button>
           <button id="adm-close" class="abtn abtn-close">✕</button>
         </div>
       </div>` });
@@ -33,7 +50,9 @@
     toggle.onclick = () => enableEdit();
     document.getElementById('adm-close').onclick = disableEdit;
     document.getElementById('adm-save').onclick = save;
+    document.getElementById('adm-export').onclick = exportHTML;
     document.getElementById('adm-reset').onclick = reset;
+    document.getElementById('adm-logout').onclick = logoutAdmin;
     document.getElementById('adm-sections').onclick = openSectionPanel;
     document.getElementById('adm-menu').onclick = openMenuPanel;
   }
@@ -413,6 +432,78 @@
     if (!confirm('Repor conteúdo original? Perderá todas as alterações.')) return;
     localStorage.removeItem(STORAGE_KEY);
     location.reload();
+  }
+
+  function logoutAdmin() {
+    if (!confirm('Tem a certeza que deseja sair do modo de administração? O botão ✏️ será ocultado até aceder novamente com o link secreto.')) return;
+    localStorage.removeItem(AUTH_KEY);
+    location.reload();
+  }
+
+  function exportHTML() {
+    save(); // Guardar as alterações mais recentes antes de exportar
+    
+    // Clonar o documento inteiro a partir da raiz (HTML)
+    const docClone = document.documentElement.cloneNode(true);
+    
+    // Lista de elementos de administração a remover do ficheiro final
+    const adminElements = [
+      '#admin-toolbar', 
+      '#admin-toggle', 
+      '#admin-panel', 
+      '.adm-add-row', 
+      '.item-ctrl', 
+      '.admin-toast',
+      'script[src="admin.js"]', 
+      'link[href="admin.css"]'
+    ];
+    
+    adminElements.forEach(sel => {
+      docClone.querySelectorAll(sel).forEach(e => e.remove());
+    });
+    
+    // Remover atributos de edição visual
+    docClone.querySelectorAll('[contenteditable]').forEach(e => {
+      e.removeAttribute('contenteditable');
+    });
+    
+    // Limpar classes de edição
+    docClone.querySelectorAll('.editable, .editing').forEach(e => {
+      e.classList.remove('editable', 'editing');
+      if (e.classList.length === 0) {
+        e.removeAttribute('class');
+      }
+    });
+
+    // Repor a classe de animação para garantir que os novos elementos animam corretamente ao scroll
+    docClone.querySelectorAll('.service-card, .area-item, .team-card, .reveal').forEach(e => {
+      e.classList.remove('animate-in');
+    });
+
+    // Limpar o estilo position:relative temporário adicionado aos cards pelo CMS
+    docClone.querySelectorAll('.service-card, .area-item, .team-card').forEach(e => {
+      if (e.style.position === 'relative') {
+        e.style.position = '';
+        if (e.style.length === 0) {
+          e.removeAttribute('style');
+        }
+      }
+    });
+    
+    // Construir a string HTML completa com DOCTYPE
+    const htmlContent = '<!DOCTYPE html>\n' + docClone.outerHTML;
+    
+    // Criar download do ficheiro
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = el('a', { href: url, download: 'index.html' });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showToast('📥 Ficheiro index.html descarregado!');
   }
 
   function loadSaved() {
