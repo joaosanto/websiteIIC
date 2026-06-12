@@ -106,6 +106,8 @@
       if (e.closest('#admin-toolbar,#admin-panel,.adm-add-row,.item-ctrl')) return;
       if (e.querySelector('img')) return;
       if (e.hasAttribute('contenteditable')) return;
+      // Skip child elements of already-contenteditable parents to prevent nested contenteditable
+      if (e.parentElement && e.parentElement.hasAttribute('contenteditable')) return;
       e.setAttribute('contenteditable', 'true');
       e.classList.add('editable');
       if (e.tagName === 'A') e.addEventListener('click', ev => { if (editMode) ev.preventDefault(); });

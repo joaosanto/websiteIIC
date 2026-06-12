@@ -22,6 +22,8 @@
     document.documentElement.lang = lang === 'pt' ? 'pt' : 'en';
 
     document.querySelectorAll('[data-pt]').forEach(el => {
+      // Skip elements with child elements to avoid destroying inner HTML (e.g. gold-text spans)
+      if (el.children.length > 0) return;
       const val = el.getAttribute(`data-${lang}`);
       if (val) el.textContent = val;
     });
