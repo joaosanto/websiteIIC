@@ -50,13 +50,21 @@ Por motivos de segurança e privacidade, o botão de edição (✏️) está **o
 * **Menu**: Adicione, reordene ou elimine links de navegação.
 * **Gestão de Blocos**: Adicione, duplique ou elimine Serviços, Áreas de Negócio ou Membros da Equipa.
 
-### 3. Como Publicar Alterações (Exportação HTML)
-As edições efetuadas no editor visual são guardadas temporariamente no seu navegador. Para as tornar públicas para todos os utilizadores:
-1. No menu de edição, clique no botão **Exportar HTML (📥)**.
-2. O sistema gerará automaticamente e descarregará um novo ficheiro `index.html`.
-3. Este ficheiro exportado é **completamente limpo**: remove todos os botões de edição, barra de ferramentas, classes temporárias, e os próprios ficheiros `admin.js` e `admin.css`, garantindo que o site público fica leve e sem código administrativo exposto.
-4. Substitua o ficheiro [index.html](file:///Users/joao.santo/Documents/GitHub/websiteIIC/index.html) na pasta do seu projeto por este ficheiro descarregado e envie as alterações para o servidor (deploy/GitHub).
+### 3. Diferença entre "Guardar" e "Exportar HTML"
+
+Para gerir as suas edições, a barra de ferramentas dispõe de dois botões principais com propósitos diferentes:
+
+* **Guardar (💾)**:
+  * **O que faz**: Grava temporariamente o estado atual das suas edições na memória do navegador (`localStorage`).
+  * **Para que serve**: Permite que feche o separador ou recarregue a página sem perder o progresso do seu trabalho.
+  * **Quem vê**: Apenas você, no mesmo navegador e computador onde editou. Não altera o site para o público nem modifica os ficheiros no servidor.
+
+* **Exportar HTML (📥)**:
+  * **O que faz**: Gera e descarrega um ficheiro `index.html` atualizado e "limpo" (removendo scripts de administração, botões de edição temporários e a barra de ferramentas).
+  * **Para que serve**: Permite **publicar** as suas edições de forma definitiva.
+  * **Como aplicar**: Para que as alterações fiquem visíveis para todo o público, deve substituir o ficheiro `index.html` na pasta do seu projeto pelo ficheiro recém-descarregado e efetuar o envio (deploy/push) para o servidor de alojamento (por exemplo, GitHub Pages).
 
 ---
 
 *Documentação atualizada em: Junho de 2026.*
+
