@@ -7,17 +7,19 @@
   let editMode = false;
 
   // ── Admin Authorization System ──
+  // Usa sessionStorage para que o acesso expire ao fechar o separador/navegador.
+  // O lápis ✏️ só aparece na sessão em que se acede com ?edit=1.
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('edit') === '1') {
-    localStorage.setItem(AUTH_KEY, 'true');
-    // Clean query parameter from URL
+    sessionStorage.setItem(AUTH_KEY, 'true');
+    // Limpar o parâmetro da URL para manter o endereço limpo
     const cleanUrl = window.location.pathname + window.location.hash;
     window.history.replaceState({}, document.title, cleanUrl);
   }
 
-  const isAdminAuthorized = localStorage.getItem(AUTH_KEY) === 'true';
+  const isAdminAuthorized = sessionStorage.getItem(AUTH_KEY) === 'true';
   if (!isAdminAuthorized) {
-    return; // Exit early if not authorized. Admin UI won't load.
+    return; // Sair imediatamente se não autorizado. O UI admin não será carregado.
   }
 
   /* ── SVG icons for cards (service section) ── */
@@ -436,7 +438,7 @@
 
   function logoutAdmin() {
     if (!confirm('Tem a certeza que deseja sair do modo de administração? O botão ✏️ será ocultado até aceder novamente com o link secreto.')) return;
-    localStorage.removeItem(AUTH_KEY);
+    sessionStorage.removeItem(AUTH_KEY);
     location.reload();
   }
 
