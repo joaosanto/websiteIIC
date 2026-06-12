@@ -1063,6 +1063,15 @@ img { max-width: 100%; display: block; }
   gap: 28px;
 }
 
+.contact-info-centered {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
 .contact-item {
   display: flex;
   gap: 16px;
