@@ -112,7 +112,13 @@
       e.classList.add('editable');
       if (e.tagName === 'A') e.addEventListener('click', ev => { if (editMode) ev.preventDefault(); });
       e.addEventListener('focus', () => e.classList.add('editing'));
-      e.addEventListener('blur', () => e.classList.remove('editing'));
+      e.addEventListener('blur', () => {
+        e.classList.remove('editing');
+        const currentLang = document.documentElement.lang || 'pt';
+        if (e.hasAttribute('data-' + currentLang)) {
+          e.setAttribute('data-' + currentLang, e.textContent);
+        }
+      });
       e.addEventListener('keydown', ev => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); e.blur(); } });
     });
   }
