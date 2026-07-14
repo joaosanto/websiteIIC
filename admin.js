@@ -118,6 +118,14 @@
         if (e.hasAttribute('data-' + currentLang)) {
           e.setAttribute('data-' + currentLang, e.textContent);
         }
+        if (e.tagName === 'A') {
+          const href = e.getAttribute('href') || '';
+          if (href.startsWith('mailto:')) {
+            e.setAttribute('href', 'mailto:' + e.textContent.trim());
+          } else if (href.startsWith('tel:')) {
+            e.setAttribute('href', 'tel:' + e.textContent.trim().replace(/[^\d+]/g, ''));
+          }
+        }
       });
       e.addEventListener('keydown', ev => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); e.blur(); } });
     });
