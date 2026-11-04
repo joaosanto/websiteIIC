@@ -1,0 +1,660 @@
+/* IIC – Admin CMS v4 (Supabase) */
+(function () {
+  'use strict';
+
+  const IIC = window.IIC || {};
+  const sb = IIC.sb;
+  const cfg = IIC.cfg || {};
+  let editMode = false;
+  let currentUser = null;
+  let dirty = false;
+
+  /* ════════════════════════════════════════
+     AUTENTICAÇÃO (Supabase – link mágico por email)
+  ════════════════════════════════════════ */
+  function cleanUrl() {
+    const p = new URLSearchParams(location.search);
+    ['edit', 'code'].forEach(k => p.delete(k));
+    const q = p.toString();
+    history.replaceState({}, document.title, location.pathname + (q ? '?' + q : '') + (/access_token|error/.test(location.hash) ? '' : location.hash));
+  }
+
+  async function checkEditor() {
+    if (!sb) return false;
+    const { data } = await sb.auth.getSession();
+    if (!data.session) return false;
+    const { data: ok, error } = await sb.rpc('is_site_editor');
+    if (error || !ok) {
+      await sb.auth.signOut();
+      alert('O email ' + data.session.user.email + ' não tem permissão para editar este site.');
+      return false;
+    }
+    currentUser = data.session.user;
+    return true;
+  }
+
+  function openLogin() {
+    if (!sb) {
+      openPanel('⚠️ Supabase não configurado', '<p class="ap-desc">Preencha <code>supabaseUrl</code> e <code>supabaseKey</code> em <code>config.js</code>.</p>');
+      return;
+    }
+    const panel = openPanel('🔐 Entrar no Editor', `
+      <p class="ap-desc">Introduza o seu email autorizado. Vai receber um link para entrar (sem password).</p>
+      <form id="adm-login" class="adm-login">
+        <input type="email" id="adm-email" required placeholder="nome@iindustrialconsulting.com" autocomplete="email">
+        <button type="submit" class="abtn abtn-gold">Enviar link</button>
+      </form>
+      <p id="adm-login-msg" class="ap-desc" role="status"></p>`);
+    const msg = panel.querySelector('#adm-login-msg');
+    panel.querySelector('#adm-login').onsubmit = async ev => {
+      ev.preventDefault();
+      const email = panel.querySelector('#adm-email').value.trim().toLowerCase();
+      if (cfg.editors && !cfg.editors.includes(email)) { msg.textContent = '❌ Este email não está autorizado.'; return; }
+      msg.textContent = 'A enviar…';
+      const { error } = await sb.auth.signInWithOtp({
+        email, options: { emailRedirectTo: location.origin + location.pathname, shouldCreateUser: true }
+      });
+      msg.textContent = error ? '❌ ' + error.message : '✅ Verifique o seu email (' + email + ') e clique no link.';
+    };
+  }
+
+  /* ── SVG icons for cards (service section) ── */
+  const DEFAULT_ICON = `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="16" y="16" width="32" height="32" rx="4" stroke="#C9A84C" stroke-width="2.5"/><path d="M24 32 L28 36 L40 24" stroke="#C9A84C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+  /* ════════════════════════════════════════
+     TOOLBAR UI
+  ════════════════════════════════════════ */
+  function buildUI() {
+    const toggle = el('button', { id: 'admin-toggle', title: 'Editar Site', innerHTML: '✏️' });
+    const toolbar = el('div', { id: 'admin-toolbar', innerHTML: `
+      <div class="atb-inner">
+        <div class="atb-left">
+          <span class="atb-badge">✏️ Modo Edição</span><span class="atb-user" id="adm-user"></span>
+          <span class="atb-hint">Clique nos textos para editar · <strong>+ Adicionar</strong> para novos blocos · <strong>✕</strong> para eliminar · <strong>🗂 Secções</strong> para gerir secções</span>
+        </div>
+        <div class="atb-right">
+          <button id="adm-theme" class="abtn abtn-secondary" title="Alternar entre tema escuro e claro">🌙 Escuro</button>
+          <button id="adm-sections" class="abtn abtn-secondary">🗂 Secções</button>
+          <button id="adm-menu" class="abtn abtn-secondary">🔗 Menu</button>
+          <button id="adm-save" class="abtn abtn-gold" title="Publicar alterações (visível para todos)">💾 Publicar</button>
+          <button id="adm-history" class="abtn abtn-secondary" title="Ver e restaurar versões anteriores">🕘 Histórico</button>
+          <button id="adm-export" class="abtn abtn-gold" title="Descarregar ficheiro index.html limpo com as edições aplicadas">📥 Exportar HTML</button>
+          <button id="adm-reset" class="abtn abtn-danger" title="Descartar alterações não publicadas">🔄 Descartar</button>
+          <button id="adm-logout" class="abtn abtn-danger" title="Terminar sessão">🚪 Sair</button>
+          <button id="adm-close" class="abtn abtn-close">✕</button>
+        </div>
+      </div>` });
+
+    document.body.append(toggle, toolbar);
+
+    toggle.onclick = () => enableEdit();
+    document.getElementById('adm-close').onclick = disableEdit;
+    document.getElementById('adm-save').onclick = save;
+    document.getElementById('adm-export').onclick = exportHTML;
+    document.getElementById('adm-reset').onclick = reset;
+    document.getElementById('adm-logout').onclick = logoutAdmin;
+    document.getElementById('adm-theme').onclick = toggleTheme;
+    document.getElementById('adm-history').onclick = openHistoryPanel;
+    document.getElementById('adm-user').textContent = currentUser ? currentUser.email : '';
+    window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+    document.addEventListener('input', e => { if (editMode && e.target.closest('[contenteditable]')) dirty = true; });
+    document.getElementById('adm-sections').onclick = openSectionPanel;
+    document.getElementById('adm-menu').onclick = openMenuPanel;
+  }
+
+  function el(tag, props = {}) {
+    const e = document.createElement(tag);
+    Object.entries(props).forEach(([k, v]) => {
+      if (k === 'innerHTML') e.innerHTML = v;
+      else if (k === 'class') e.className = v;
+      else e.setAttribute(k, v);
+    });
+    return e;
+  }
+
+  /* ════════════════════════════════════════
+     EDIT MODE
+  ════════════════════════════════════════ */
+  function enableEdit() {
+    editMode = true;
+    document.body.classList.add('edit-mode');
+    document.getElementById('admin-toggle').style.display = 'none';
+    document.getElementById('admin-toolbar').classList.add('visible');
+    makeTextsEditable();
+    injectAddButtons();
+    injectItemControls();
+  }
+
+  function disableEdit() {
+    editMode = false;
+    document.body.classList.remove('edit-mode');
+    document.getElementById('admin-toggle').style.display = '';
+    document.getElementById('admin-toolbar').classList.remove('visible');
+    document.querySelectorAll('[contenteditable]').forEach(e => {
+      e.removeAttribute('contenteditable');
+      e.classList.remove('editable', 'editing');
+    });
+    document.querySelectorAll('.adm-add-row, .item-ctrl').forEach(e => e.remove());
+    closePanel();
+  }
+
+  /* ════════════════════════════════════════
+     TEXT EDITING
+  ════════════════════════════════════════ */
+  function makeTextsEditable() {
+    const sel = 'h1,h2,h3,h4,h5,p,span,a,.hero-badge,.section-tag,.featured-badge,.stat-num,.stat-label';
+    document.querySelectorAll(sel).forEach(e => {
+      if (e.closest('#admin-toolbar,#admin-panel,.adm-add-row,.item-ctrl')) return;
+      if (e.querySelector('img')) return;
+      if (e.hasAttribute('contenteditable')) return;
+      // Skip child elements of already-contenteditable parents to prevent nested contenteditable
+      if (e.parentElement && e.parentElement.hasAttribute('contenteditable')) return;
+      e.setAttribute('contenteditable', 'true');
+      e.classList.add('editable');
+      if (e.tagName === 'A') e.addEventListener('click', ev => { if (editMode) ev.preventDefault(); });
+      e.addEventListener('focus', () => { e.classList.add('editing'); e._before = e.textContent; });
+      e.addEventListener('blur', () => {
+        e.classList.remove('editing');
+        const lang = document.documentElement.lang || 'pt';
+        if (e.children.length === 0 && e.textContent !== e._before) {
+          if (!e.hasAttribute('data-pt')) e.setAttribute('data-pt', lang === 'pt' ? e.textContent : (e._before || e.textContent));
+          e.setAttribute('data-' + lang, e.textContent);
+          dirty = true;
+        }
+        if (e.tagName === 'A') {
+          const href = e.getAttribute('href') || '';
+          if (href.startsWith('mailto:')) {
+            e.setAttribute('href', 'mailto:' + e.textContent.trim());
+          } else if (href.startsWith('tel:')) {
+            e.setAttribute('href', 'tel:' + e.textContent.trim().replace(/[^\d+]/g, ''));
+          }
+        }
+      });
+      e.addEventListener('keydown', ev => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); e.blur(); } });
+    });
+  }
+
+  /* ════════════════════════════════════════
+     ADD BUTTONS (per section)
+  ════════════════════════════════════════ */
+  function injectAddButtons() {
+    document.querySelectorAll('.adm-add-row').forEach(e => e.remove());
+    addRowBtn('#services .services-grid', 'Serviço', addServiceCard);
+    addRowBtn('#areas .areas-grid', 'Área de Negócio', addAreaItem);
+    addRowBtn('#team .team-grid', 'Membro de Equipa', addTeamCard);
+  }
+
+  function addRowBtn(containerSel, label, handler) {
+    const container = document.querySelector(containerSel);
+    if (!container) return;
+    const row = el('div', { class: 'adm-add-row' });
+    const btn = el('button', { class: 'adm-add-btn', innerHTML: `+ Adicionar ${label}` });
+    btn.onclick = () => { handler(container); injectItemControls(); makeTextsEditable(); };
+    row.appendChild(btn);
+    container.parentElement.appendChild(row);
+  }
+
+  /* ════════════════════════════════════════
+     ITEM CONTROLS (delete / duplicate)
+  ════════════════════════════════════════ */
+  function injectItemControls() {
+    document.querySelectorAll('.item-ctrl').forEach(e => e.remove());
+    const targets = [
+      ...document.querySelectorAll('.service-card'),
+      ...document.querySelectorAll('.area-item'),
+      ...document.querySelectorAll('.team-card'),
+    ];
+    targets.forEach(card => {
+      const ctrl = el('div', { class: 'item-ctrl' });
+      const dup = el('button', { class: 'ic-btn ic-dup', innerHTML: '⧉', title: 'Duplicar' });
+      const del = el('button', { class: 'ic-btn ic-del', innerHTML: '✕', title: 'Eliminar' });
+      dup.onclick = ev => { ev.stopPropagation(); duplicateItem(card); };
+      del.onclick = ev => { ev.stopPropagation(); deleteItem(card); };
+      ctrl.append(dup, del);
+      card.style.position = 'relative';
+      card.appendChild(ctrl);
+    });
+  }
+
+  function duplicateItem(card) {
+    const clone = card.cloneNode(true);
+    clone.querySelectorAll('.item-ctrl').forEach(e => e.remove());
+    card.parentElement.insertBefore(clone, card.nextSibling);
+    injectItemControls();
+    makeTextsEditable();
+    updateAreaNumbers();
+  }
+
+  function deleteItem(card) {
+    if (!confirm('Remover este elemento?')) return;
+    card.remove();
+    updateAreaNumbers();
+  }
+
+  function updateAreaNumbers() {
+    document.querySelectorAll('.area-item .area-number').forEach((n, i) => {
+      n.textContent = String(i + 1).padStart(2, '0');
+    });
+  }
+
+  /* ════════════════════════════════════════
+     ADD: SERVICE CARD
+  ════════════════════════════════════════ */
+  function addServiceCard(grid) {
+    const card = el('div', { class: 'service-card animate-in' });
+    card.innerHTML = `<div class="service-card-inner">
+      <div class="service-icon-wrap">${DEFAULT_ICON}</div>
+      <h3>Novo Serviço</h3>
+      <p>Descrição do serviço. Clique para editar.</p>
+      <a href="#contact" class="service-link">Saber mais →</a>
+    </div>`;
+    grid.appendChild(card);
+  }
+
+  /* ════════════════════════════════════════
+     ADD: AREA ITEM
+  ════════════════════════════════════════ */
+  function addAreaItem(grid) {
+    const count = grid.querySelectorAll('.area-item').length + 1;
+    const item = el('div', { class: 'area-item animate-in' });
+    item.innerHTML = `
+      <div class="area-number">${String(count).padStart(2, '0')}</div>
+      <div class="area-content">
+        <h4>Nova Área</h4>
+        <p>Descrição da área de negócio.</p>
+      </div>`;
+    grid.appendChild(item);
+  }
+
+  /* ════════════════════════════════════════
+     ADD: TEAM CARD
+  ════════════════════════════════════════ */
+  function addTeamCard(grid) {
+    const card = el('div', { class: 'team-card animate-in' });
+    card.innerHTML = `
+      <div class="team-avatar">
+        <div class="avatar-placeholder">AA</div>
+        <div class="team-gold-ring"></div>
+      </div>
+      <div class="team-info">
+        <h4>Nome Completo</h4>
+        <span class="team-role">Cargo / Especialidade</span>
+        <p>Breve descrição do consultor e experiência.</p>
+        <a href="#contact" class="team-cv-btn">Descarregar CV</a>
+      </div>`;
+    grid.appendChild(card);
+  }
+
+  /* ════════════════════════════════════════
+     PANEL SYSTEM
+  ════════════════════════════════════════ */
+  function closePanel() {
+    const p = document.getElementById('admin-panel');
+    if (p) p.remove();
+  }
+
+  function openPanel(title, content) {
+    closePanel();
+    const panel = el('div', { id: 'admin-panel' });
+    panel.innerHTML = `
+      <div class="ap-backdrop"></div>
+      <div class="ap-box">
+        <div class="ap-header">
+          <h3>${title}</h3>
+          <button class="ap-close">✕</button>
+        </div>
+        <div class="ap-body">${content}</div>
+      </div>`;
+    panel.querySelector('.ap-backdrop').onclick = closePanel;
+    panel.querySelector('.ap-close').onclick = closePanel;
+    document.body.appendChild(panel);
+    return panel;
+  }
+
+  /* ════════════════════════════════════════
+     SECTION MANAGER
+  ════════════════════════════════════════ */
+  function openSectionPanel() {
+    function renderSectionPanel() {
+      const sections = [...document.querySelectorAll('main > section')];
+      const rows = sections.map(sec => {
+        const id = sec.id || sec.className.split(' ')[0];
+        const label = sec.querySelector('h2')?.textContent?.trim() || id;
+        const hidden = sec.style.display === 'none';
+        return `<div class="sp-row" data-sec-id="${id}">
+          <span class="sp-label">${escHtml(label)}</span>
+          <div class="sp-actions">
+            <label class="sp-toggle">
+              <input type="checkbox" data-sec="${escHtml(id)}" ${hidden ? '' : 'checked'}>
+              <span class="sp-slider"></span>
+            </label>
+            <button class="sp-del ic-btn ic-del" data-sec="${escHtml(id)}" title="Apagar secção permanentemente">🗑</button>
+          </div>
+        </div>`;
+      }).join('');
+
+      const panel = openPanel('🗂 Gerir Secções', `
+        <p class="ap-desc">Ative/desative ou apague permanentemente secções do site.</p>
+        <div class="sp-list">${rows}</div>`);
+
+      panel.querySelectorAll('input[data-sec]').forEach(chk => {
+        chk.onchange = () => {
+          const target = document.getElementById(chk.dataset.sec)
+            || document.querySelector(`.${chk.dataset.sec}`);
+          if (target) target.style.display = chk.checked ? '' : 'none';
+        };
+      });
+
+      panel.querySelectorAll('.sp-del').forEach(btn => {
+        btn.onclick = () => {
+          const id = btn.dataset.sec;
+          const target = document.getElementById(id) || document.querySelector(`.${id}`);
+          if (!target) return;
+          const label = target.querySelector('h2')?.textContent?.trim() || id;
+          if (!confirm(`Apagar permanentemente a secção "${label}"?\n\nEsta ação remove a secção do site. Pode ser revertida com "🔄 Descartar" (antes de publicar) ou pelo "🕘 Histórico".`)) return;
+          target.remove();
+          renderSectionPanel();
+          showToast('🗑 Secção apagada!');
+        };
+      });
+    }
+
+    renderSectionPanel();
+  }
+
+  /* ════════════════════════════════════════
+     MENU MANAGER — in-memory state
+  ════════════════════════════════════════ */
+  function openMenuPanel() {
+    /* Read current DOM state into an array */
+    let menuItems = [...document.querySelectorAll('#nav-menu li')].map(li => {
+      const a = li.querySelector('a');
+      return {
+        text: a?.textContent?.trim() || '',
+        href: a?.getAttribute('href') || '#'
+      };
+    });
+
+    function renderPanel() {
+      closePanel();
+
+      const rows = menuItems.length
+        ? menuItems.map((item, i) => `
+          <div class="mp-row" data-idx="${i}">
+            <div class="mp-order">
+              <button class="mp-up ic-btn" data-idx="${i}" title="Mover para cima" ${i === 0 ? 'disabled' : ''}>↑</button>
+              <button class="mp-dn ic-btn" data-idx="${i}" title="Mover para baixo" ${i === menuItems.length - 1 ? 'disabled' : ''}>↓</button>
+            </div>
+            <input class="mp-text" type="text" data-idx="${i}" value="${escHtml(item.text)}" placeholder="Texto do link">
+            <input class="mp-href" type="text" data-idx="${i}" value="${escHtml(item.href)}" placeholder="#secção ou URL">
+            <button class="mp-del ic-btn ic-del" data-idx="${i}" title="Remover">✕</button>
+          </div>`).join('')
+        : `<p class="ap-empty">Sem itens de menu. Adicione um abaixo.</p>`;
+
+      const panel = openPanel('🔗 Gerir Menu de Navegação', `
+        <p class="ap-desc">Adicione, edite, remova ou reordene os links de navegação. Clique em <strong>Aplicar</strong> para ver as alterações no site.</p>
+        <div id="mp-list">${rows}</div>
+        <div class="ap-actions">
+          <button id="mp-add" class="abtn abtn-gold">+ Adicionar Link</button>
+          <button id="mp-apply" class="abtn abtn-secondary">✓ Aplicar ao Site</button>
+        </div>`);
+
+      /* Sync text changes back to state */
+      panel.querySelectorAll('.mp-text').forEach(inp => {
+        inp.oninput = () => { menuItems[+inp.dataset.idx].text = inp.value; };
+      });
+      panel.querySelectorAll('.mp-href').forEach(inp => {
+        inp.oninput = () => { menuItems[+inp.dataset.idx].href = inp.value; };
+      });
+
+      /* Delete */
+      panel.querySelectorAll('.mp-del').forEach(btn => {
+        btn.onclick = () => {
+          menuItems.splice(+btn.dataset.idx, 1);
+          renderPanel();
+        };
+      });
+
+      /* Move up */
+      panel.querySelectorAll('.mp-up').forEach(btn => {
+        btn.onclick = () => {
+          const i = +btn.dataset.idx;
+          if (i > 0) {
+            [menuItems[i - 1], menuItems[i]] = [menuItems[i], menuItems[i - 1]];
+            renderPanel();
+          }
+        };
+      });
+
+      /* Move down */
+      panel.querySelectorAll('.mp-dn').forEach(btn => {
+        btn.onclick = () => {
+          const i = +btn.dataset.idx;
+          if (i < menuItems.length - 1) {
+            [menuItems[i], menuItems[i + 1]] = [menuItems[i + 1], menuItems[i]];
+            renderPanel();
+          }
+        };
+      });
+
+      /* Add new item */
+      panel.querySelector('#mp-add').onclick = () => {
+        menuItems.push({ text: 'Novo Link', href: '#' });
+        renderPanel();
+      };
+
+      /* Apply to DOM */
+      panel.querySelector('#mp-apply').onclick = () => {
+        applyMenuToDOM();
+        closePanel();
+        showToast('✅ Menu atualizado!');
+      };
+    }
+
+    function applyMenuToDOM() {
+      const navMenu = document.getElementById('nav-menu');
+      if (!navMenu) return;
+      navMenu.innerHTML = menuItems
+        .map(item => `<li><a href="${escHtml(item.href)}" class="nav-link">${escHtml(item.text)}</a></li>`)
+        .join('');
+      if (editMode) {
+        makeTextsEditable();
+        injectItemControls();
+      }
+    }
+
+    renderPanel();
+  }
+
+  /* ════════════════════════════════════════
+     UTILITY
+  ════════════════════════════════════════ */
+  function escHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  /* ════════════════════════════════════════
+     SAVE / RESET
+  ════════════════════════════════════════ */
+  async function save() {
+    if (!sb || !currentUser) { openLogin(); return; }
+    if (document.activeElement && document.activeElement.isContentEditable) document.activeElement.blur();
+    const btn = document.getElementById('adm-save');
+    btn.disabled = true; btn.textContent = '⏳ A publicar…';
+    const sections = IIC.collectSections();
+    const { error } = await sb.from('site_content').upsert({ slug: IIC.slug, sections }, { onConflict: 'slug' });
+    btn.disabled = false; btn.innerHTML = '💾 Publicar';
+    if (error) { showToast('❌ Erro: ' + error.message); console.error(error); return; }
+    dirty = false;
+    showToast('✅ Publicado! Já está visível para todos.');
+  }
+
+  function reset() {
+    if (!confirm('Descartar todas as alterações ainda não publicadas?')) return;
+    dirty = false;
+    location.reload();
+  }
+
+  async function logoutAdmin() {
+    if (dirty && !confirm('Tem alterações por publicar. Sair mesmo assim?')) return;
+    dirty = false;
+    if (sb) await sb.auth.signOut();
+    location.reload();
+  }
+
+  async function openHistoryPanel() {
+    const panel = openPanel('🕘 Histórico de Versões', '<p class="ap-desc">A carregar…</p>');
+    const { data, error } = await sb.from('site_content_history')
+      .select('id, updated_at, updated_by').eq('slug', IIC.slug)
+      .order('updated_at', { ascending: false }).limit(30);
+    const body = panel.querySelector('.ap-body');
+    if (error) { body.innerHTML = '<p class="ap-desc">❌ ' + escHtml(error.message) + '</p>'; return; }
+    if (!data.length) { body.innerHTML = '<p class="ap-empty">Ainda não há versões publicadas.</p>'; return; }
+    body.innerHTML = '<p class="ap-desc">Pré-visualize uma versão e depois clique em 💾 Publicar para a repor.</p><div class="sp-list">' +
+      data.map((v, i) => `<div class="sp-row"><span class="sp-label">${new Date(v.updated_at).toLocaleString('pt-PT')}${i === 0 ? ' · <strong>atual</strong>' : ''}<br><small>${escHtml(v.updated_by || '')}</small></span>
+        <div class="sp-actions"><button class="abtn abtn-secondary" data-ver="${v.id}">👁 Ver</button></div></div>`).join('') + '</div>';
+    body.querySelectorAll('[data-ver]').forEach(b => b.onclick = async () => {
+      const { data: row, error: e2 } = await sb.from('site_content_history').select('sections').eq('id', b.dataset.ver).single();
+      if (e2) { showToast('❌ ' + e2.message); return; }
+      const wasEditing = editMode;
+      if (wasEditing) disableEdit();
+      IIC.applySections(row.sections);
+      if (window.setLang) setLang(document.documentElement.lang || 'pt');
+      if (window.IIC_observeAnimated) IIC_observeAnimated();
+      enableEdit();
+      dirty = true;
+      showToast('👁 Versão carregada. Clique 💾 Publicar para a repor.');
+    });
+  }
+
+  function exportHTML() {
+    
+    // Clonar o documento inteiro a partir da raiz (HTML)
+    const docClone = document.documentElement.cloneNode(true);
+    
+    // Lista de elementos de administração a remover do ficheiro final
+    const adminElements = [
+      '#admin-toolbar', 
+      '#admin-toggle', 
+      '#admin-panel', 
+      '.adm-add-row', 
+      '.item-ctrl', 
+      '.admin-toast',
+      'script[src="admin.js"]',
+      'link[href="admin.css"]',
+      '.adm-login-fab'
+    ];
+    
+    adminElements.forEach(sel => {
+      docClone.querySelectorAll(sel).forEach(e => e.remove());
+    });
+    
+    // Remover atributos de edição visual
+    docClone.querySelectorAll('[contenteditable]').forEach(e => {
+      e.removeAttribute('contenteditable');
+    });
+    
+    // Limpar classes de edição
+    docClone.querySelectorAll('.editable, .editing').forEach(e => {
+      e.classList.remove('editable', 'editing');
+      if (e.classList.length === 0) {
+        e.removeAttribute('class');
+      }
+    });
+
+    // Repor a classe de animação para garantir que os novos elementos animam corretamente ao scroll
+    docClone.querySelectorAll('.service-card, .area-item, .team-card, .reveal').forEach(e => {
+      e.classList.remove('animate-in');
+    });
+
+    // Limpar o estilo position:relative temporário adicionado aos cards pelo CMS
+    docClone.querySelectorAll('.service-card, .area-item, .team-card').forEach(e => {
+      if (e.style.position === 'relative') {
+        e.style.position = '';
+        if (e.style.length === 0) {
+          e.removeAttribute('style');
+        }
+      }
+    });
+    
+    // Construir a string HTML completa com DOCTYPE
+    const htmlContent = '<!DOCTYPE html>\n' + docClone.outerHTML;
+    
+    // Criar download do ficheiro
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = el('a', { href: url, download: 'index.html' });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showToast('📥 Ficheiro index.html descarregado!');
+  }
+
+  /* ════════════════════════════════════════
+     TOAST
+  ════════════════════════════════════════ */
+  function showToast(msg) {
+    let t = document.querySelector('.admin-toast');
+    if (!t) { t = el('div', { class: 'admin-toast' }); document.body.appendChild(t); }
+    t.textContent = msg;
+    t.classList.add('visible');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('visible'), 2500);
+  }
+
+  /* ════════════════════════════════════════
+     THEME TOGGLE
+  ════════════════════════════════════════ */
+  function loadTheme() {
+    const saved = localStorage.getItem('iic-theme');
+    if (saved === 'light') {
+      document.documentElement.classList.add('light-theme');
+    } else {
+      document.documentElement.classList.remove('light-theme');
+    }
+    updateThemeButton();
+  }
+
+  function toggleTheme() {
+    const isLight = document.documentElement.classList.toggle('light-theme');
+    localStorage.setItem('iic-theme', isLight ? 'light' : 'dark');
+    updateThemeButton();
+    showToast(isLight ? '☀️ Tema claro ativado!' : '🌙 Tema escuro ativado!');
+  }
+
+  function updateThemeButton() {
+    const btn = document.getElementById('adm-theme');
+    if (!btn) return;
+    const isLight = document.documentElement.classList.contains('light-theme');
+    btn.innerHTML = isLight ? '☀️ Claro' : '🌙 Escuro';
+    btn.title = isLight ? 'Mudar para tema escuro' : 'Mudar para tema claro';
+  }
+
+  /* ════════════════════════════════════════
+     INIT
+  ════════════════════════════════════════ */
+  async function init() {
+    loadTheme();
+    const ok = await checkEditor().catch(() => false);
+    cleanUrl();
+    if (!ok) {
+      const fab = el('button', { class: 'adm-login-fab', id: 'admin-toggle', title: 'Entrar no editor', innerHTML: '🔐' });
+      fab.onclick = openLogin;
+      document.body.appendChild(fab);
+      return;
+    }
+    buildUI();
+    updateThemeButton();
+    if (IIC.status !== 'remote') showToast('ℹ️ A mostrar conteúdo base. Publique para criar a 1.ª versão na base de dados.');
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+
+})();

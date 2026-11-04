@@ -1,0 +1,13 @@
+/* IIC – v2.css: melhorias de acessibilidade e pequenos ajustes */
+.skip-link{position:absolute;left:-9999px;top:8px;z-index:10000;background:#C9A84C;color:#0b0f17;padding:10px 16px;border-radius:6px;font-weight:600;text-decoration:none}
+.skip-link:focus{left:16px}
+:focus-visible{outline:2px solid #C9A84C;outline-offset:3px}
+html.cms-loading main{opacity:0}
+main{transition:opacity .25s ease}
+img{max-width:100%;height:auto}
+.hero-bg-img{height:100%;object-fit:cover}
+html,body{overflow-x:hidden}
+.area-content p,.team-info p,.service-card p{overflow-wrap:anywhere}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
